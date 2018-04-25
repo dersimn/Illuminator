@@ -5,7 +5,7 @@
 
 // FastLED
 #define FASTLED_NUM_LEDS      16
-#define FASTLED_FPS           120
+#define FASTLED_FPS           100
 
 // mosfetLED
 #define MOSFETLED_PIN         D5
