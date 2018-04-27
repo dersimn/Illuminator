@@ -9,8 +9,8 @@ Thread ledAnimationThread = Thread();
 uint8_t hue = 0;
 uint8_t sat = 0;
 uint8_t bri = 0;
-uint8_t ani = 2;
-String aniStr = "confetti";
+uint8_t ani = 0;
+String aniStr[] = {"none", "sinelon", "confetti", "colorwheel"};
 
 void setup_FastLED() {
   strip.Begin();
@@ -22,7 +22,6 @@ void setup_FastLED() {
 
   ledAnimationThread.onRun(ledAnimationController);
   ledAnimationThread.setInterval(FASTLED_INTERVAL);
-  ledAnimationThread.enabled = false;
   threadControl.add(&ledAnimationThread);
 }
 void setup_FastLED_Network() {
@@ -35,10 +34,9 @@ void light_subscribe(String topic, String message) {
   JsonVariant root = jsonBuffer.parse(message);
 
   if ( root.is<float>() || root.is<int>() ) {
-    ledAnimationThread.enabled = false;
+    ani = 0;
     setBri( root.as<float>() );
-    
-    ledSolidColor(hue, sat, bri);
+
     publishLight();
     return;
   }
@@ -54,18 +52,17 @@ void light_subscribe(String topic, String message) {
       setSat( rootObject["sat"].as<float>() );
     }
     if ( rootObject.containsKey("animation") ) {
-      aniStr = rootObject["animation"].as<String>();
-      if      (aniStr == "sinelon")    { ani = 1; }
-      else if (aniStr == "confetti")   { ani = 2; }
-      else if (aniStr == "colorwheel") { ani = 3; }
+      String recv = rootObject["animation"].as<String>();
+      if      (recv == aniStr[0]) { ani = 0; }
+      else if (recv == aniStr[1]) { ani = 1; }
+      else if (recv == aniStr[2]) { ani = 2; }
+      else if (recv == aniStr[3]) { ani = 3; }
       
-      ledAnimationThread.enabled = true;
       publishLight();
       return;
     } else {
-      ledAnimationThread.enabled = false;
+      ani = 0;
     }
-    ledSolidColor(hue, sat, bri);
     publishLight();
   }
 }
@@ -75,8 +72,8 @@ void publishLight() {
 
   JsonObject& root = jsonBuffer.createObject();
   root["val"] = rescale(bri, 255, 1.0);
-  if (ledAnimationThread.enabled) {
-    root["animation"] = aniStr;
+  if (ani) {
+    root["animation"] = aniStr[ani];
   } else {
     root["hue"] = rescale(hue, 255, 1.0);
     root["sat"] = rescale(sat, 255, 1.0);
@@ -106,17 +103,22 @@ float setBri(float val) {
 }
 
 void ledAnimationController() {
-  hue++;
   switch(ani) {
     case 1:
+      hue++;
       ledAnimationLoop_Sinelon(13);
       break;
     case 2:
+      hue++;
       ledAnimationLoop_Confetti();
       break;
     case 3:
+      hue++;
       ledSolidColor(hue, sat, bri);
       break;
+    case 0:
+    default:
+      fill_solid(leds, FASTLED_NUM_LEDS, CHSV(hue, sat, bri));
   }
 }
 
