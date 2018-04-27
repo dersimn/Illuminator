@@ -118,7 +118,9 @@ void ledAnimationController() {
       break;
     case 0:
     default:
-      fill_solid(leds, FASTLED_NUM_LEDS, CHSV(hue, sat, bri));
+      for (int i = 0; i < FASTLED_NUM_LEDS; i++) {
+        nblend(leds[i], CHSV(hue, sat, bri), FASTLED_INTERVAL);
+      }
   }
 }
 
