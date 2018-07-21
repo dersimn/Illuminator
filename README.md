@@ -1,5 +1,7 @@
 [![Photo](https://github.com/dersimn/Illuminator/blob/master/docs/IMG_7829.TRIM.gif?raw=true)](https://raw.githubusercontent.com/dersimn/Illuminator/master/docs/IMG_7829.TRIM.m4v)
 
+Use a WS2812 LED Strip to build an RGB light with support for animations.
+
 ## Topics
 
 	dersimn/status/Illuminator_21CB16/fastled <-> {"val":0,"hue":0.043137,"sat":1,"animation":"sinelon"}
