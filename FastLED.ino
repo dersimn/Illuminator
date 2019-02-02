@@ -114,7 +114,7 @@ void ledAnimationController() {
       break;
     case 3:
       hue++;
-      ledSolidColor(hue, sat, bri);
+      fill_solid(leds, FASTLED_NUM_LEDS, CHSV(hue, sat, bri));
       break;
     case 0:
     default:
@@ -131,9 +131,6 @@ void ledOutput() {
   strip.Show();  
 }
 
-void ledSolidColor(uint8_t hue, uint8_t sat, uint8_t bri) {
-  fill_solid(leds, FASTLED_NUM_LEDS, CHSV(hue, sat, bri));
-}
 void ledAnimationLoop_Sinelon(uint8_t bpm) {
   fadeToBlackBy(leds, FASTLED_NUM_LEDS, FASTLED_INTERVAL);
   uint16_t pos = beatsin16(bpm, 0, FASTLED_NUM_LEDS-1);
@@ -144,4 +141,3 @@ void ledAnimationLoop_Confetti() {
   uint16_t pos = random16(FASTLED_NUM_LEDS);
   leds[pos] += CHSV(hue+random8(64), 255, bri);
 }
-
