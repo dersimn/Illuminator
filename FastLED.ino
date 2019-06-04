@@ -34,50 +34,33 @@ void light_subscribe(String topic, String message) {
     return;
   }
 
-  if ( doc.is<float>() || doc.is<int>() ) {
-    ani = 0;
-    setBri( doc.as<float>() );
-
-    publishLight();
-    return;
-  }
-  if ( doc.is<bool>() ) {
+  if ( doc.is<bool>() ) {                                 // bool
     ani = 0;
     setBri( doc.as<bool>() ? 1.0 : 0.0 );
-
-    publishLight();
-    return;
-  }
-  if ( doc.is<JsonObject>() ) {
+  } else if ( doc.is<float>() || doc.is<int>() ) {        // int / float
+    ani = 0;
+    setBri( doc.as<float>() );
+  } else if ( doc.is<JsonObject>() ) {                    // object
     JsonObject rootObject = doc.as<JsonObject>();
     if ( rootObject.containsKey("val") ) {
-      setBri( rootObject["val"].as<float>() );
+      setBri( rootObject["val"] );
     }
     if ( rootObject.containsKey("hue") ) {
-      setHue( rootObject["hue"].as<float>() );
+      setHue( rootObject["hue"] );
     }
     if ( rootObject.containsKey("sat") ) {
-      setSat( rootObject["sat"].as<float>() );
+      setSat( rootObject["sat"] );
     }
-    if ( rootObject.containsKey("transitiontime") ) {
-      transitionTime = rootObject["transitiontime"].as<int>();
-    } else {
-      transitionTime = 400; // Restore default value if not in object
-    }
-    if ( rootObject.containsKey("animation") ) {
-      String recv = rootObject["animation"].as<String>();
-      if      (recv == aniStr[0]) { ani = 0; }
-      else if (recv == aniStr[1]) { ani = 1; }
-      else if (recv == aniStr[2]) { ani = 2; }
-      else if (recv == aniStr[3]) { ani = 3; }
-      
-      publishLight();
-      return;
-    } else {
-      ani = 0;
-    }
-    publishLight();
+    
+    transitionTime = rootObject["transitiontime"] | 400;
+    
+    String recv = rootObject["animation"] | "none";
+    if      (recv == aniStr[0]) { ani = 0; }
+    else if (recv == aniStr[1]) { ani = 1; }
+    else if (recv == aniStr[2]) { ani = 2; }
+    else if (recv == aniStr[3]) { ani = 3; }
   }
+  publishLight();
 }
 void publishLight() {
   String output;
