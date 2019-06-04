@@ -30,18 +30,22 @@ void setup_FastLED_Network() {
 }
 
 void light_subscribe(String topic, String message) {
-  DynamicJsonBuffer jsonBuffer;
-  JsonVariant root = jsonBuffer.parse(message);
+  StaticJsonDocument<500> doc;
+  auto error = deserializeJson(doc, message);
+  if (error) {
+    Log.error(s+"deserializeJson() failed with code "+error.c_str());
+    return;
+  }
 
-  if ( root.is<float>() || root.is<int>() ) {
+  if ( doc.is<float>() || doc.is<int>() ) {
     ani = 0;
-    setBri( root.as<float>() );
+    setBri( doc.as<float>() );
 
     publishLight();
     return;
   }
-  if ( root.is<JsonObject>() ) {
-    JsonObject& rootObject = root.as<JsonObject>();
+  if ( doc.is<JsonObject>() ) {
+    JsonObject rootObject = doc.as<JsonObject>();
     if ( rootObject.containsKey("val") ) {
       setBri( rootObject["val"].as<float>() );
     }
@@ -68,19 +72,17 @@ void light_subscribe(String topic, String message) {
 }
 void publishLight() {
   String output;
-  DynamicJsonBuffer jsonBuffer;
-
-  JsonObject& root = jsonBuffer.createObject();
-  root["val"] = rescale(bri, 255, 1.0);
+  StaticJsonDocument<500> doc;
+  
+  doc["val"] = rescale(bri, 255, 1.0);
   if (ani) {
-    root["animation"] = aniStr[ani];
+    doc["animation"] = aniStr[ani];
   } else {
-    root["hue"] = rescale(hue, 255, 1.0);
-    root["sat"] = rescale(sat, 255, 1.0);
+    doc["hue"] = rescale(hue, 255, 1.0);
+    doc["sat"] = rescale(sat, 255, 1.0);
   }
 
-  root.printTo(output);
-  mqtt.publish(s+MQTT_PREFIX+"/status/"+BOARD_ID+"/fastled", output, true);
+  mqtt.publish(s+MQTT_PREFIX+"/status/"+BOARD_ID+"/fastled", doc.as<String>(), true);
 }
 
 float setHue(float val) {
