@@ -154,7 +154,7 @@ void ledFade() {
   if (oldColor == CHSV(hue, sat, bri)) {
     fill_solid(leds, FASTLED_NUM_LEDS, CHSV(hue, sat, bri));
   } else {
-    int stepsNeededForTransition = transitionTime / FASTLED_INTERVAL;
+    int stepsNeededForTransition = limit(transitionTime / FASTLED_INTERVAL, 1, 255);
     static int currentStep = 0;
 
     CRGB oldRGB = oldColor;
