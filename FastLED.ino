@@ -19,10 +19,6 @@ void setup_FastLED() {
   ledOutputThread.onRun(ledOutput);
   ledOutputThread.setInterval(FASTLED_INTERVAL);
   threadControl.add(&ledOutputThread);
-
-  ledAnimationThread.onRun(ledAnimationController);
-  ledAnimationThread.setInterval(FASTLED_INTERVAL);
-  threadControl.add(&ledAnimationThread);
 }
 void setup_FastLED_Network() {
   mqtt.subscribe(s+MQTT_PREFIX+"/set/"+BOARD_ID+"/fastled", light_subscribe);
@@ -124,7 +120,10 @@ void ledAnimationController() {
   }
 }
 
-void ledOutput() { 
+void ledOutput() {
+  ledAnimationController();
+
+  // FastLED to NeoPixel Adapter
   RgbColor pixel;
   for (int i = 0; i < FASTLED_NUM_LEDS; i++) {
     pixel = RgbColor(leds[i].r, leds[i].g, leds[i].b);
