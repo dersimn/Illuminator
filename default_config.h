@@ -7,9 +7,6 @@
 #define FASTLED_NUM_LEDS      16
 #define FASTLED_FPS           100
 
-// mosfetLED
-#define MOSFETLED_PIN         D5
-
 // Maintenance
 #define MAINTENANCE_UPTIME_INTERVAL     60
 #define MAINTENANCE_INFO_INTERVAL       60
