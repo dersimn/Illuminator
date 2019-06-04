@@ -41,6 +41,13 @@ void light_subscribe(String topic, String message) {
     publishLight();
     return;
   }
+  if ( doc.is<bool>() ) {
+    ani = 0;
+    setBri( doc.as<bool>() ? 1.0 : 0.0 );
+
+    publishLight();
+    return;
+  }
   if ( doc.is<JsonObject>() ) {
     JsonObject rootObject = doc.as<JsonObject>();
     if ( rootObject.containsKey("val") ) {
