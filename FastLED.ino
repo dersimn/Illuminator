@@ -13,6 +13,9 @@ uint8_t ani = 0;
 int transitionTime = 400;
 String aniStr[] = {"none", "sinelon", "confetti", "colorwheel"};
 
+int currentStep = 0;
+CHSV oldColor = CHSV(0,0,0);
+
 void setup_FastLED() {
   strip.Begin();
   strip.Show();  
@@ -59,6 +62,11 @@ void light_subscribe(String topic, String message) {
     else if (recv == aniStr[1]) { ani = 1; }
     else if (recv == aniStr[2]) { ani = 2; }
     else if (recv == aniStr[3]) { ani = 3; }
+  }
+
+  if (currentStep) {
+    currentStep = 0;
+    oldColor = CHSV(hue, sat, bri); 
   }
   publishLight();
 }
@@ -139,13 +147,10 @@ void ledAnimationLoop_Confetti() {
   leds[pos] += CHSV(hue+random8(64), 255, bri);
 }
 void ledFade() {
-  static CHSV oldColor = CHSV(0,0,0);
-  
   if (oldColor == CHSV(hue, sat, bri)) {
     fill_solid(leds, FASTLED_NUM_LEDS, CHSV(hue, sat, bri));
   } else {
     int stepsNeededForTransition = limit(transitionTime / FASTLED_INTERVAL, 1, 255);
-    static int currentStep = 0;
 
     CRGB oldRGB = oldColor;
     CRGB newRGB = CHSV(hue, sat, bri);
