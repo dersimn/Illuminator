@@ -52,7 +52,7 @@ void setup() {
   
   Serial.begin(115200);
   logHandler.addModule(&serialModule);
-  Log.info("Initializing 'DevilRemote'");
+  Log.info("Initializing 'Illuminator'");
   Log.info( String("ESP ID: ") + ESP_ID );
 
   // Init Submodules
