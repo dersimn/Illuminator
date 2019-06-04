@@ -10,6 +10,7 @@ uint8_t hue = 0;
 uint8_t sat = 0;
 uint8_t bri = 0;
 uint8_t ani = 0;
+int transitionTime = 400;
 String aniStr[] = {"none", "sinelon", "confetti", "colorwheel"};
 
 void setup_FastLED() {
@@ -50,6 +51,11 @@ void light_subscribe(String topic, String message) {
     }
     if ( rootObject.containsKey("sat") ) {
       setSat( rootObject["sat"].as<float>() );
+    }
+    if ( rootObject.containsKey("transitiontime") ) {
+      transitionTime = rootObject["transitiontime"].as<int>();
+    } else {
+      transitionTime = 400; // Restore default value if not in object
     }
     if ( rootObject.containsKey("animation") ) {
       String recv = rootObject["animation"].as<String>();
@@ -116,7 +122,7 @@ void ledAnimationController() {
       break;
     case 0:
     default:
-      fill_solid(leds, FASTLED_NUM_LEDS, CHSV(hue, sat, bri));
+      ledFade();
   }
 }
 
@@ -141,4 +147,23 @@ void ledAnimationLoop_Confetti() {
   fadeToBlackBy(leds, FASTLED_NUM_LEDS, FASTLED_INTERVAL/2);
   uint16_t pos = random16(FASTLED_NUM_LEDS);
   leds[pos] += CHSV(hue+random8(64), 255, bri);
+}
+void ledFade() {
+  static CHSV oldColor = CHSV(0,0,0);
+  
+  if (oldColor == CHSV(hue, sat, bri)) {
+    fill_solid(leds, FASTLED_NUM_LEDS, CHSV(hue, sat, bri));
+  } else {
+    int stepsNeededForTransition = transitionTime / FASTLED_INTERVAL;
+    static int currentStep = 0;
+
+    CHSV middle = blend(oldColor, CHSV(hue, sat, bri), 255 / stepsNeededForTransition * ++currentStep);
+    //Log.info(s+"fade "+currentStep+" "+stepsNeededForTransition+" - h: "+middle.h+" s: "+middle.s+" b: "+middle.v);
+    fill_solid(leds, FASTLED_NUM_LEDS, middle);
+
+    if (currentStep >= stepsNeededForTransition) {
+      oldColor = CHSV(hue, sat, bri);
+      currentStep = 0;
+    }
+  }
 }
