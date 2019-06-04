@@ -157,8 +157,9 @@ void ledFade() {
     int stepsNeededForTransition = transitionTime / FASTLED_INTERVAL;
     static int currentStep = 0;
 
-    CHSV middle = blend(oldColor, CHSV(hue, sat, bri), 255 / stepsNeededForTransition * ++currentStep);
-    //Log.info(s+"fade "+currentStep+" "+stepsNeededForTransition+" - h: "+middle.h+" s: "+middle.s+" b: "+middle.v);
+    CRGB oldRGB = oldColor;
+    CRGB newRGB = CHSV(hue, sat, bri);
+    CRGB middle = blend(oldRGB, newRGB, 255 / stepsNeededForTransition * ++currentStep);
     fill_solid(leds, FASTLED_NUM_LEDS, middle);
 
     if (currentStep >= stepsNeededForTransition) {
