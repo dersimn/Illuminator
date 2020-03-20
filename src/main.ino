@@ -130,6 +130,9 @@ void setup() {
   threadControl.add(&threadUptime);
 
   // -------------------------- App --------------------------
+  setup_Maintanance();
+  setup_Sensor_SingleDallas();
+  
   setup_FastLED_Network();
 
   Log.info("Setup done");
