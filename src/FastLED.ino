@@ -25,7 +25,7 @@ void setup_FastLED() {
   threadControl.add(&ledOutputThread);
 }
 void setup_FastLED_Network() {
-  mqtt.subscribe(s+MQTT_PREFIX+"/set/"+BOARD_ID+"/fastled", light_subscribe);
+  mqtt.subscribe(s+APP_PREFIX+"/set/"+ESP_ID+"/fastled", light_subscribe);
   publishLight();
 }
 
@@ -82,7 +82,7 @@ void publishLight() {
     doc["sat"] = rescale(sat, 255, 1.0);
   }
 
-  mqtt.publish(s+MQTT_PREFIX+"/status/"+BOARD_ID+"/fastled", doc.as<String>(), true);
+  mqtt.publish(s+APP_PREFIX+"/status/"+ESP_ID+"/fastled", doc.as<String>(), true);
 }
 
 float setHue(float val) {
