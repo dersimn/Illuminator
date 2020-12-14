@@ -64,13 +64,13 @@ void setup_Sensor_Dallas() {
         LogDallas.warn(s+"Sensor "+devices_str[i]+" read error");
       } else {
         if (devices_str[i] == DS_INTERNAL) {
-          mqtt.publish(s+APP_PREFIX+"/maintenance/"+ESP_ID+"/temperature", String(tempC, 2));
+          mqtt.publish(s+MQTT_PREFIX+"/maintenance/temperature", String(tempC, 2));
         } else {
           doc[devices_str[i]] = tempC;
         }
       }
     }
-    mqtt.publish(s+APP_PREFIX+"/status/"+ESP_ID+"/temperature/dallas", doc.as<String>(), true);
+    mqtt.publish(s+MQTT_PREFIX+"/status/temperature/dallas", doc.as<String>(), true);
   });
   dallasOutputThread.enabled = false;
   threadControl.add(&dallasOutputThread);

@@ -29,6 +29,7 @@
 const String s = "";
 const String ESP_ID = upperCaseStr(String(ESP.getChipId(), HEX));
 const String BOARD_ID = s+APP_PREFIX+"_"+ESP_ID;
+const String MQTT_PREFIX = s+"dersimn/"+APP_PREFIX+"/"+ESP_ID;
 
 WiFiClient        espClient;
 PubSubClient      mqttClient(MQTT_SERVER, 1883, espClient);
@@ -46,8 +47,7 @@ ThreadController threadControl = ThreadController();
 Thread threadMqtt = Thread();
 Thread threadUptime = Thread();
 ThreadRunOnce threadMqttRunOnce = ThreadRunOnce();
-
-void mqttReconnect();
+Thread threadState = Thread();
 
 void setup() {
   logHandler.addModule(&serialModule);
@@ -124,13 +124,17 @@ void setup() {
     doc["millis"] = this_millis;
     doc["rollover"] = rollover_count;
 
-    mqtt.publish(s+APP_PREFIX+"/maintenance/"+ESP_ID+"/uptime", doc.as<String>());
+    mqtt.publish(s+MQTT_PREFIX+"/maintenance/uptime", doc.as<String>());
   });
   threadUptime.setInterval(MAINTENANCE_INTERVAL);
   threadControl.add(&threadUptime);
 
   // -------------------------- App --------------------------
-  setup_Maintanance();
+  threadState.onRun([](){
+    publishLight();
+  });
+  threadState.setInterval(MAINTENANCE_INTERVAL);
+  threadControl.add(&threadState);
   
   setup_FastLED_Network();
   setup_Sensor_Dallas();
@@ -148,10 +152,10 @@ void loop() {
 void mqttReconnect() {
   LogMqtt.info(s+ "Connecting to "+MQTT_SERVER);
   
-  if (mqtt.connect(BOARD_ID, s+APP_PREFIX+"/maintenance/"+ESP_ID+"/online", 0, true, "false")) {
+  if (mqtt.connect(BOARD_ID, s+MQTT_PREFIX+"/online", 0, true, "false")) {
     LogMqtt.info(s+"Connected and (re)subscribed to "+mqtt.resubscribe()+" topic(s)");
 
-    mqtt.publish(s+APP_PREFIX+"/maintenance/"+ESP_ID+"/online", "true", true);
+    mqtt.publish(s+MQTT_PREFIX+"/online", "true", true);
 
     // Post static info once every (re)connect
     StaticJsonDocument<500> doc;
@@ -162,7 +166,7 @@ void mqttReconnect() {
     doc["build_timestamp"] = BUILD_TIMESTAMP;
     doc["ip_address"] = WiFi.localIP().toString();
 
-    mqtt.publish(s+APP_PREFIX+"/maintenance/"+ESP_ID+"/info", doc.as<String>(), true);
+    mqtt.publish(s+MQTT_PREFIX+"/maintenance/info", doc.as<String>(), true);
   } else {
     LogMqtt.error(s+"Connection failed with rc="+mqttClient.state());
   }
