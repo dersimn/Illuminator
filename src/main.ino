@@ -131,9 +131,9 @@ void setup() {
 
   // -------------------------- App --------------------------
   setup_Maintanance();
-  setup_Sensor_SingleDallas();
   
   setup_FastLED_Network();
+  setup_Sensor_Dallas();
 
   Log.info("Setup done");
 }
