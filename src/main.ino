@@ -182,7 +182,7 @@ void mqttReconnect() {
     fastled["led-count"] = FASTLED_NUM_LEDS;
     fastled["fps"] = FASTLED_FPS;
     
-    JsonObject sensor_dallas  = doc.createNestedObject("sensor_dallas");
+    JsonObject sensor_dallas  = doc.createNestedObject("sensor-dallas");
     sensor_dallas["interval"] = DS_INTERVAL;
     sensor_dallas["precision"] = DS_PRECISION;
     sensor_dallas["max-devices"] = DS_MAX_DEVICES;

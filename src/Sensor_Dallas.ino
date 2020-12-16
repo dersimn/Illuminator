@@ -49,7 +49,7 @@ void setup_Sensor_Dallas() {
 
   dallasMeassureThread.onRun([](){
     sensors.requestTemperatures();
-    dallasOutputThread.setRunOnce(2000);    
+    dallasOutputThread.setRunOnce(5000);    
   });
   dallasMeassureThread.setInterval(DS_INTERVAL);
   threadControl.add(&dallasMeassureThread);
