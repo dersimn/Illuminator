@@ -184,6 +184,9 @@ void mqttReconnect() {
     
     JsonObject sensor_dallas  = doc.createNestedObject("sensor_dallas");
     sensor_dallas["interval"] = DS_INTERVAL;
+    sensor_dallas["precision"] = DS_PRECISION;
+    sensor_dallas["max-devices"] = DS_MAX_DEVICES;
+    sensor_dallas["parasite-power"] = DS_PARASITE_POWER;
 
     mqtt.publish(s+MQTT_PREFIX+"/maintenance/config", doc.as<String>(), true);
 
