@@ -26,7 +26,6 @@ void setup_FastLED() {
 }
 void setup_FastLED_Network() {
   mqtt.subscribe(s+MQTT_PREFIX+"/set/fastled", light_subscribe);
-  publishLight();
 }
 
 void light_subscribe(String topic, String message) {
