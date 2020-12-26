@@ -60,7 +60,7 @@ void setup_Sensor_Dallas() {
 
     for (uint8_t i = 0; i < device_count; i++) {
       float tempC = sensors.getTempC(devices[i]);
-      if (tempC == -127) {
+      if (tempC == 85 || tempC == -127) {
         LogDallas.warn(s+"Sensor "+devices_str[i]+" read error");
       } else {
         if (devices_str[i] == DS_INTERNAL) {
